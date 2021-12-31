@@ -128,22 +128,23 @@ play_music_track
         align 2
 AUDIO_TBL
         ;       # Command|id                    # Track Name
-        dc.w    MSU_PLAY_LOOP|$02               ;  1 - Opening Theme
-        dc.w    MSU_PLAY_LOOP|$0f               ;  2 - Courtyard
-        dc.w    MSU_PLAY|$1d                    ;  3 - Courtyard Victory
-        dc.w    MSU_PLAY_LOOP|$1e               ;  4 - Warrior's Shrine
-        dc.w    MSU_PLAY|$2f                    ;  5 - Warrior's Shrine Victory
-        dc.w    MSU_PLAY_LOOP|$30               ;  6 - The Pit
-        dc.w    MSU_PLAY|$3e                    ;  7 - The Pit Victory
-        dc.w    MSU_PLAY_LOOP|$3f               ;  8 - Hall
-        dc.w    MSU_PLAY|$4f                    ;  9 - Hall Victory
+        dc.w    MSU_PLAY_LOOP|$02               ; 01 - Opening Theme
+        dc.w    MSU_PLAY_LOOP|$0f               ; 02 - Courtyard
+        dc.w    MSU_PLAY|$1d                    ; 03 - Courtyard Victory
+        dc.w    MSU_PLAY_LOOP|$1e               ; 04 - Entrance
+        dc.w    MSU_PLAY|$2f                    ; 05 - Entrance Victory
+        dc.w    MSU_PLAY_LOOP|$30               ; 06 - Warriors Shrine
+        dc.w    MSU_PLAY|$3e                    ; 07 - Warriors Shrine Victory
+        dc.w    MSU_PLAY_LOOP|$3f               ; 08 - The Pit
+        dc.w    MSU_PLAY|$4f                    ; 09 - The Pit Victory
         dc.w    MSU_PLAY_LOOP|$0b               ; 10 - Goro's Lair
         dc.w    MSU_PLAY|$52                    ; 11 - Goro's Lair Victory
-        dc.w    MSU_PLAY_LOOP|$50               ; 12 - Entrance
-        dc.w    MSU_PLAY|$53                    ; 13 - Entrance Victory
-        dc.w    MSU_PLAY|$0a                    ; 14 - 2-Player vs
-        dc.w    MSU_PLAY|$55                    ; 15 - Test Your Might, Fatality
-        dc.w    MSU_PLAY_LOOP|$04               ; 16 - Bio screen
+        dc.w    MSU_PLAY_LOOP|$50               ; 12 - The Hall
+        dc.w    MSU_PLAY|$53                    ; 13 - The Hall Victory
+        dc.w    MSU_PLAY|$0a                    ; 14 - 2 Player Versus
+        dc.w    MSU_PLAY|$55                    ; 15 - Test Your Might / Fatality
+        dc.w    MSU_PLAY_LOOP|$04               ; 16 - Bio Screen
+        dc.w    MSU_PLAY_LOOP|$08               ; 17 - Battle plan
 AUDIO_TBL_END
 
 ; MSU-MD DRIVER: -----------------------------------------------------------------------------------
