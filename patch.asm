@@ -7,7 +7,7 @@ MSU_COMM_CMD_CK     equ $a1201f                 ; Comm command 7 (low byte)
 MSU_COMM_STATUS     equ $a12020                 ; Comm status 0 (0-ready, 1-init, 2-cmd busy)
 
 ; Where to put the code
-ROM_END             equ $3ff5dc
+ROM_END             equ $3ff59c
 
 ; MSU COMMANDS: ------------------------------------------------------------------------------------------
 
@@ -41,10 +41,17 @@ MSU_PLAYOF          equ $1a00                   ; PLAYOF    #1 = decimal no. of 
 
         org     $200                            ; Original ENTRY POINT
 Game
+        jsr     restart
 
         ; Original play_music_track sub routine
         org     $1faf44
         jmp     play_music_track
+
+        ; Game over
+        org     $30972e
+        jmp     play_game_over
+        org     $30973e
+        rts
 
         org     ROM_END
 
@@ -69,6 +76,19 @@ audio_init
 ; Sound: -------------------------------------------------------------------------------------
 
         align   2
+restart
+        MSU_COMMAND MSU_PAUSE,  0
+
+        ; Run original code
+        tst.l   $a10008
+        rts
+
+
+play_game_over
+        MSU_COMMAND MSU_PLAY_LOOP,18
+       rts
+
+
 play_music_track
         tst.b   d0                              ; d0 = track number
         bne     .play
