@@ -21,6 +21,7 @@
 |  15   | $55 | Test Your Might / Fatality              |
 |  16   | $04 | Bio Screen                              |
 |  17   | $08 | Battle plan                             |
+|  18   | 08  | Game Over                               |
 
 ### Original Mega Drive
 
@@ -45,3 +46,4 @@ Based on: https://project2612.org/details.php?id=143
 |  15   | 55  | Test Your Might, Fatality               |
 |  16   | 04  | Bio screen                              |
 |  17   | 08  | Battle plan                             |
+|  18   | 08  | Game Over                               |
