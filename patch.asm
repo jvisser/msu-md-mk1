@@ -7,7 +7,7 @@ MSU_COMM_CMD_CK     equ $a1201f                 ; Comm command 7 (low byte)
 MSU_COMM_STATUS     equ $a12020                 ; Comm status 0 (0-ready, 1-init, 2-cmd busy)
 
 ; Where to put the code
-ROM_END             equ ($3f15b0 + $c350)
+ROM_END             equ $3ff5dc
 
 ; MSU COMMANDS: ------------------------------------------------------------------------------------------
 
