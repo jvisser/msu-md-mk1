@@ -53,6 +53,12 @@ Game
         org     $30973e
         rts
 
+        ; Goro crash fix
+        org     $62a0
+        move    a7,usp
+        org     $62ac
+        move    usp,a7
+
         org     ROM_END
 
 ENTRY_POINT
