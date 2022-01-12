@@ -7,7 +7,10 @@ MSU_COMM_CMD_CK     equ $a1201f                 ; Comm command 7 (low byte)
 MSU_COMM_STATUS     equ $a12020                 ; Comm status 0 (0-ready, 1-init, 2-cmd busy)
 
 ; Where to put the code
-ROM_END             equ $3ff59c
+ROM_END             equ $3ff540
+
+; Variables
+victory             equ $fffffefe
 
 ; MSU COMMANDS: ------------------------------------------------------------------------------------------
 
@@ -53,6 +56,38 @@ Game
         org     $30973e
         rts
 
+        ; Continue
+        org     $232cd0
+        rept    9
+        nop
+        endr
+        jsr     play_continue
+
+        ; Title screen
+        org     $2328fa
+        jsr     play_title_screen
+
+        ; Victory
+        org     $12738
+        jmp     init_vars
+init_vars_return
+        org     $233572
+        jsr     play_victory
+        org     $309f3e
+        moveq   #-1,d3
+        org     $309f5e
+        moveq   #-1,d3
+        org     $309f7e
+        moveq   #-1,d3
+        org     $308f90
+        moveq   #-1,d3
+        org     $308e56
+        moveq   #-1,d3
+
+        ; Map Ermac stage music to The Pit
+        org     $19e818
+        moveq   #$3f,d0
+
         ; Goro crash fix
         org     $62a0
         move    a7,usp
@@ -82,6 +117,13 @@ audio_init
 ; Sound: -------------------------------------------------------------------------------------
 
         align   2
+
+init_vars
+        lea     victory,sp
+        sf      (sp)
+        jmp     init_vars_return
+
+
 restart
         MSU_COMMAND MSU_PAUSE,  0
 
@@ -91,11 +133,33 @@ restart
 
 
 play_game_over
-        MSU_COMMAND MSU_PLAY_LOOP,18
-       rts
+        MSU_COMMAND MSU_PLAY,18
+        rts
+
+
+play_continue
+        MSU_COMMAND MSU_PLAY,20
+        rts
+
+
+play_victory
+        st  victory
+
+        MSU_COMMAND MSU_PLAY,21
+        rts
+
+
+play_title_screen
+        MSU_COMMAND MSU_PLAY,22
+        rts
 
 
 play_music_track
+        tst.b   victory
+        beq     .continue
+            clr.w   d0                          ; Skip playing other tracks while in victory mode
+            bra     .original_code
+.continue
         tst.b   d0                              ; d0 = track number
         bne     .play
             ; 0 = Stop
@@ -124,7 +188,7 @@ play_music_track
                 addq.b  #1,MSU_COMM_CMD_CK
 
                 ; Run stop command for original driver
-                moveq   #0,d0
+                clr.w   d0
                 bra     .play_done
 .next_track
         dbra    d1,.find_track_loop
@@ -154,7 +218,7 @@ play_music_track
         align 2
 AUDIO_TBL
         ;       # Command|id                    # Track Name
-        dc.w    MSU_PLAY_LOOP|$02               ; 01 - Opening Theme
+        dc.w    MSU_PLAY_LOOP|$02               ; 01 - Choose Your Fighter
         dc.w    MSU_PLAY_LOOP|$0f               ; 02 - Courtyard
         dc.w    MSU_PLAY|$1d                    ; 03 - Courtyard Victory
         dc.w    MSU_PLAY_LOOP|$1e               ; 04 - Entrance
@@ -168,9 +232,11 @@ AUDIO_TBL
         dc.w    MSU_PLAY_LOOP|$50               ; 12 - The Hall
         dc.w    MSU_PLAY|$53                    ; 13 - The Hall Victory
         dc.w    MSU_PLAY|$0a                    ; 14 - 2 Player Versus
-        dc.w    MSU_PLAY|$55                    ; 15 - Test Your Might / Fatality
+        dc.w    MSU_PLAY|$55                    ; 15 - Test Your Might
         dc.w    MSU_PLAY_LOOP|$04               ; 16 - Bio Screen
         dc.w    MSU_PLAY_LOOP|$08               ; 17 - Battle plan
+        dc.w    MSU_PLAY_LOOP|$ff               ; 18 - Game Over (Unmapped)
+        dc.w    MSU_PLAY|$54                    ; 19 - Fatality
 AUDIO_TBL_END
 
 ; MSU-MD DRIVER: -----------------------------------------------------------------------------------
