@@ -9,7 +9,8 @@ SourceROMs:    Mortal Kombat Arcade Edition v1-0a (W) [!].md (CRC: C4FDD15C)
 
 Thanks:        ArcadeTV for providing the patch framework (https://github.com/ArcadeTV)
                Krikzz for the msu-md driver and Mega Everdrive (https://github.com/krikzz)
-               Master Linkuei for Mortal Kombat Arcade Edition (https://www.romhacking.net/reviews/8189/)
+               Master Linkuei, Billytime!Games, Chev Chelios, Danilo Dias for Mortal Kombat Arcade Edition (https://www.romhacking.net/reviews/8189/)
+               Relikk for the SoundPack and testing
 
 Source:        https://github.com/jvisser/msu-md-mk1
 

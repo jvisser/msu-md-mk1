@@ -26,6 +26,7 @@
 |  20   | -   | Continue                                |
 |  21   | -   | Victory                                 |
 |  22   | -   | Title screen                            |
+|  23   | -   | Goro Lives                              |
 
 ### Original Mega Drive
 
@@ -55,3 +56,4 @@ Based on: https://project2612.org/details.php?id=143
 |  20   | -   | Continue                                |
 |  21   | -   | Victory                                 |
 |  22   | -   | Title screen                            |
+|  23   | -   | Goro Lives                              |
