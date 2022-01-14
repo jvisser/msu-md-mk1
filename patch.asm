@@ -7,7 +7,7 @@ MSU_COMM_CMD_CK     equ $a1201f                 ; Comm command 7 (low byte)
 MSU_COMM_STATUS     equ $a12020                 ; Comm status 0 (0-ready, 1-init, 2-cmd busy)
 
 ; Where to put the code
-ROM_END             equ $3ff540
+ROM_END             equ $3ff522
 
 ; Variables
 victory             equ $fffffefe
@@ -67,6 +67,12 @@ Game
         org     $2328fa
         jsr     play_title_screen
 
+        ; Goro lives
+        org     $232b02
+        jsr     play_goro_lives
+        org     $232b08
+        moveq   #-1,d3
+
         ; Victory
         org     $12738
         jmp     init_vars
@@ -84,9 +90,15 @@ init_vars_return
         org     $308e56
         moveq   #-1,d3
 
-        ; Map Ermac stage music to The Pit
+        ; Ermac
         org     $19e818
-        moveq   #$3f,d0
+        moveq   #$3f,d0     ; Map Ermac stage music to The Pit
+        org     $234432     ; Replace Ermac intro sound with title screen instead of "choose your fighter"
+        jsr     play_title_screen
+        org     $2344a2
+        nop
+        nop
+        nop
 
         ; Goro crash fix
         org     $62a0
@@ -151,6 +163,11 @@ play_victory
 
 play_title_screen
         MSU_COMMAND MSU_PLAY,22
+        rts
+
+
+play_goro_lives
+        MSU_COMMAND MSU_PLAY,23
         rts
 
 
