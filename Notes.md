@@ -27,6 +27,12 @@
 |  21   | -   | Victory                                 |
 |  22   | -   | Title screen                            |
 |  23   | -   | Goro Lives                              |
+|  24   | -   | Shang Tsung                             |
+|  25   | -   | Finish Him - Courtyard                  |
+|  26   | -   | Finish Him - Entrance / Goro's Lair     |
+|  27   | -   | Finish Him - Warriors Shrine            |
+|  28   | -   | Finish Him - The Pit                    |
+|  29   | -   | Finish Him - The Hall / Pit bottom      |
 
 ### Original Mega Drive
 
@@ -57,3 +63,9 @@ Based on: https://project2612.org/details.php?id=143
 |  21   | -   | Victory                                 |
 |  22   | -   | Title screen                            |
 |  23   | -   | Goro Lives                              |
+|  24   | -   | Shang Tsung                             |
+|  25   | -   | Finish Him - Courtyard                  |
+|  26   | -   | Finish Him - Entrance / Goro's Lair     |
+|  27   | -   | Finish Him - Warriors Shrine            |
+|  28   | -   | Finish Him - The Pit                    |
+|  29   | -   | Finish Him - The Hall / Pit bottom      |
