@@ -7,10 +7,12 @@ MSU_COMM_CMD_CK     equ $a1201f                 ; Comm command 7 (low byte)
 MSU_COMM_STATUS     equ $a12020                 ; Comm status 0 (0-ready, 1-init, 2-cmd busy)
 
 ; Where to put the code
-ROM_END             equ $3ff4be
+ROM_END             equ $3ff49a
 
 ; Variables
 victory             equ $fffffefe
+stage               equ $ffffaabc
+enemy_encounter     equ $ffffaaba
 
 ; MSU COMMANDS: ------------------------------------------------------------------------------------------
 
@@ -114,6 +116,10 @@ init_vars_return
         nop
         nop
 
+        ; enemy encounter id
+        org     $62f4
+        jmp     increment_enemy_encounter
+
         ; Goro crash fix
         org     $62a0
         move    sp,usp
@@ -185,18 +191,28 @@ play_goro_lives
         rts
 
 
+increment_enemy_encounter
+        addq.w  #1,enemy_encounter
+        cmp.w   #$0b,enemy_encounter
+        bne     .ok
+            jsr play_goro_lives ; For first Goro encounter
+.ok
+        jmp     $5cbc
+
+
 play_music_track
         ; If in victory mode, skip other tracks
         tst.b   victory
         beq     .check_finish_him
             clr.w   d0
             bra     .original_code
+
 .check_finish_him
         ; If "Finish Him" play stage specific variant
         cmp.b   #$55,d0
-        bne     .check_shang_tsung
+        bne     .check_goro_shang_tsung
             move.l  a0,-(sp)
-            move.w  $ffffaabc,d0
+            move.w  stage,d0
             add.w   d0,d0
             lea     AUDIO_TBL_FINISH_HIM,a0
             move.w  (a0,d0),d0
@@ -207,15 +223,24 @@ play_music_track
             clr.w   d0                          ; Run stop command for original driver
             bra     .original_code
 
-.check_shang_tsung
-        ; If Shang Tsung battle, play final boss theme
-        cmp.b   #$0b,d0 ; Goro's Lair
+.check_goro_shang_tsung
+        ; Goro's Lair song requested?
+        cmp.b   #$0b,d0
         bne     .check_stop
-        cmp.w   #$0c,$ffffaaba
+        ; For Goro fight?
+        cmp.w   #$0b,enemy_encounter
+        beq     .fight_goro
+        ; For Shang Tsung fight?
+        cmp.w   #$0c,enemy_encounter
         bne     .check_stop
             MSU_COMMAND MSU_PLAY,24
             clr.w   d0                          ; Run stop command for original driver
             bra     .original_code
+
+.fight_goro
+        jsr     play_goro_lives
+        clr.w   d0                          ; Run stop command for original driver
+        bra     .original_code
 
 .check_stop
         ; If cmd 0... stop
@@ -263,8 +288,6 @@ play_music_track
         movem.l  (sp)+,d1-d2/a0
         jmp .original_code
 
-.play_finish_him
-
 .original_code
         addq.w  #1,d0
         move.w  d0,($fa42).w
@@ -308,7 +331,7 @@ AUDIO_TBL_FINISH_HIM
         dc.w    MSU_PLAY|27                     ; Warriors Shrine - Finish Him
         dc.w    MSU_PLAY|28                     ; The Pit - Finish Him
         dc.w    MSU_PLAY|29                     ; The Hall - Finish Him
-        dc.w    MSU_PLAY|26                     ; Goro's Lair - Finish Him
+        dc.w    MSU_PLAY|27                     ; Goro's Lair - Finish Him
         dc.w    MSU_PLAY|29                     ; Pit bottom - Finish Him
 AUDIO_TBL_FINISH_HIM_END
 
