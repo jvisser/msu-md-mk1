@@ -7,7 +7,7 @@ MSU_COMM_CMD_CK     equ $a1201f                 ; Comm command 7 (low byte)
 MSU_COMM_STATUS     equ $a12020                 ; Comm status 0 (0-ready, 1-init, 2-cmd busy)
 
 ; Where to put the code
-ROM_END             equ $3ff522
+ROM_END             equ $3ff4be
 
 ; Variables
 victory             equ $fffffefe
@@ -46,6 +46,11 @@ MSU_PLAYOF          equ $1a00                   ; PLAYOF    #1 = decimal no. of 
 Game
         jsr     restart
 
+        ; Vars
+        org     $12738
+        jmp     init_vars
+init_vars_return
+
         ; Original play_music_track sub routine
         org     $1faf44
         jmp     play_music_track
@@ -73,10 +78,13 @@ Game
         org     $232b08
         moveq   #-1,d3
 
+        ; Override pit bottom to the hall/throne room
+        org     $548
+        dc.w    $0050
+        org     $566
+        dc.w    $0053
+
         ; Victory
-        org     $12738
-        jmp     init_vars
-init_vars_return
         org     $233572
         jsr     play_victory
         org     $309f3e
@@ -90,9 +98,15 @@ init_vars_return
         org     $308e56
         moveq   #-1,d3
 
+        ; Remap test your might
+        org     $2329e0
+        moveq   #$7f,d0
+
         ; Ermac
-        org     $19e818
-        moveq   #$3f,d0     ; Map Ermac stage music to The Pit
+        org     $19e81a
+        nop                 ; Restore original stage music
+        nop
+        nop
         org     $234432     ; Replace Ermac intro sound with title screen instead of "choose your fighter"
         jsr     play_title_screen
         org     $2344a2
@@ -102,9 +116,9 @@ init_vars_return
 
         ; Goro crash fix
         org     $62a0
-        move    a7,usp
+        move    sp,usp
         org     $62ac
-        move    usp,a7
+        move    usp,sp
 
         org     ROM_END
 
@@ -172,17 +186,46 @@ play_goro_lives
 
 
 play_music_track
+        ; If in victory mode, skip other tracks
         tst.b   victory
-        beq     .continue
-            clr.w   d0                          ; Skip playing other tracks while in victory mode
+        beq     .check_finish_him
+            clr.w   d0
             bra     .original_code
-.continue
+.check_finish_him
+        ; If "Finish Him" play stage specific variant
+        cmp.b   #$55,d0
+        bne     .check_shang_tsung
+            move.l  a0,-(sp)
+            move.w  $ffffaabc,d0
+            add.w   d0,d0
+            lea     AUDIO_TBL_FINISH_HIM,a0
+            move.w  (a0,d0),d0
+            movea.l (sp)+,a0
+            MSU_WAIT
+            move.w  d0,MSU_COMM_CMD
+            addq.b  #1,MSU_COMM_CMD_CK
+            clr.w   d0                          ; Run stop command for original driver
+            bra     .original_code
+
+.check_shang_tsung
+        ; If Shang Tsung battle, play final boss theme
+        cmp.b   #$0b,d0 ; Goro's Lair
+        bne     .check_stop
+        cmp.w   #$0c,$ffffaaba
+        bne     .check_stop
+            MSU_COMMAND MSU_PLAY,24
+            clr.w   d0                          ; Run stop command for original driver
+            bra     .original_code
+
+.check_stop
+        ; If cmd 0... stop
         tst.b   d0                              ; d0 = track number
-        bne     .play
+        bne     .start_track_search
             ; 0 = Stop
             MSU_COMMAND MSU_PAUSE, 0
-        bra     .original_code
-.play
+            bra     .original_code
+
+.start_track_search
         ; Save used registers
         movem.l d1-d2/a0,-(sp)
 
@@ -218,6 +261,9 @@ play_music_track
 .play_done
         ; Restore used registers
         movem.l  (sp)+,d1-d2/a0
+        jmp .original_code
+
+.play_finish_him
 
 .original_code
         addq.w  #1,d0
@@ -249,12 +295,22 @@ AUDIO_TBL
         dc.w    MSU_PLAY_LOOP|$50               ; 12 - The Hall
         dc.w    MSU_PLAY|$53                    ; 13 - The Hall Victory
         dc.w    MSU_PLAY|$0a                    ; 14 - 2 Player Versus
-        dc.w    MSU_PLAY|$55                    ; 15 - Test Your Might
+        dc.w    MSU_PLAY|$7f                    ; 15 - Test Your Might
         dc.w    MSU_PLAY_LOOP|$04               ; 16 - Bio Screen
         dc.w    MSU_PLAY_LOOP|$08               ; 17 - Battle plan
         dc.w    MSU_PLAY_LOOP|$ff               ; 18 - Game Over (Unmapped)
         dc.w    MSU_PLAY|$54                    ; 19 - Fatality
 AUDIO_TBL_END
+
+AUDIO_TBL_FINISH_HIM
+        dc.w    MSU_PLAY|25                     ; Courtyard - Finish Him
+        dc.w    MSU_PLAY|26                     ; Entrance - Finish Him
+        dc.w    MSU_PLAY|27                     ; Warriors Shrine - Finish Him
+        dc.w    MSU_PLAY|28                     ; The Pit - Finish Him
+        dc.w    MSU_PLAY|29                     ; The Hall - Finish Him
+        dc.w    MSU_PLAY|26                     ; Goro's Lair - Finish Him
+        dc.w    MSU_PLAY|29                     ; Pit bottom - Finish Him
+AUDIO_TBL_FINISH_HIM_END
 
 ; MSU-MD DRIVER: -----------------------------------------------------------------------------------
 
